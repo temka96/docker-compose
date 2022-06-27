@@ -19,6 +19,7 @@ services:
   networks:
     - app-network
   deploy:
+    mode: replicated
     replicas: 2 
 
  web:
@@ -34,6 +35,7 @@ services:
   networks:
     - app-network
   deploy:
+    mode: replicated
     replicas: 2
 
  redis:
@@ -66,6 +68,16 @@ services:
       - db
     networks:
       - app-network  
+
+ traefik:
+    image: traefik:2.8
+    container_name: traefik
+    ports:
+      - 80:80
+    depends_on:
+      - web
+    networks:
+      - app-network
 
 volumes:
   wordpress:
