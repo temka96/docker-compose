@@ -17,7 +17,7 @@ services:
   depends_on:
     - db
   networks:
-    - app-network
+    - internal
   deploy:
     mode: replicated
     replicas: 2 
@@ -33,18 +33,28 @@ services:
   depends_on:
       - wordpress
   networks:
-    - app-network
+    - internal
+    - proxy
   deploy:
     mode: replicated
     replicas: 2
-
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.docker.network=proxy"
+             
  redis:
     image: redis
     container_name: redis
     depends_on:
       - wordpress
     networks:
-      - app-network
+      - internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=false"
 
  db:
     image: mysql:5.7
@@ -57,7 +67,12 @@ services:
     volumes: 
       - db:/var/lib/mysql
     networks:
-      - app-network
+      - internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=false"
  
  adminer:
     image: adminer:4.8.1
@@ -67,22 +82,37 @@ services:
     depends_on:
       - db
     networks:
-      - app-network  
+      - internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=false"  
 
  traefik:
     image: traefik:2.8
     container_name: traefik
     ports:
       - 80:80
+    volumes:
+      - ./traefik/traefik.yml:/traefik.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       - web
     networks:
-      - app-network
+      - proxy
+    deploy:
+      mode: replicated
+      replicas: 1    
 
 volumes:
   wordpress:
   db:
 
 networks:
-  app-network:
-    driver: bridge 
+  proxy:
+    external: true
+    name: proxy
+  internal:
+    external: false
+    name: internal
