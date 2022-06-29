@@ -1,0 +1,97 @@
+version: "3.1"
+services:
+
+ wordpress:
+  image: wordpress:php7.4-fpm-alpine
+  container_name: wordpress
+  ports:
+    - 9000:9000
+  environment:
+    WORDPRESS_DB_HOST: db
+    WORDPRESS_DB_USER: user
+    WORDPRESS_DB_PASSWORD: password
+    WORDPRESS_DB_NAME: mysqldb
+    WORDPRESS_REDIS_HOST: redis
+  volumes:
+    - wordpress:/var/www/html
+  depends_on:
+    - db
+  networks:
+    - proxy
+ 
+#  wordpress2:
+#   image: wordpress:php7.4-fpm-alpine
+#   container_name: wordpress2
+#   ports:
+#     - 9090:9000
+#   environment:
+#     WORDPRESS_DB_HOST: db
+#     WORDPRESS_DB_USER: user
+#     WORDPRESS_DB_PASSWORD: password
+#     WORDPRESS_DB_NAME: mysqldb
+#     WORDPRESS_REDIS_HOST: redis
+#   volumes:
+#     - wordpress:/var/www/html
+#   depends_on:
+#     - db
+
+ myserver1:
+  image: nginx
+  container_name: nginx1
+  volumes:
+    - wordpress:/var/www/html
+    - ./templates:/etc/nginx/conf.d
+  depends_on:
+      - wordpress
+  networks:
+    - proxy
+ 
+#  myserver2:
+#   image: nginx
+#   container_name: nginx2
+#   volumes:
+#     - wordpress:/var/www/html
+#     - ./templates:/etc/nginx/conf.d
+#   depends_on:
+#       - wordpress1
+#   networks:
+#     - proxy
+ 
+ redis:
+    image: redis
+    container_name: redis
+    depends_on:
+      - wordpress
+    networks:
+    - proxy
+      
+ db:
+    image: mysql:5.7
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: mysqldb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: toor
+    volumes: 
+      - db:/var/lib/mysql
+    networks:
+    - proxy
+ 
+ adminer:
+    image: adminer:4.8.1
+    container_name: adminer
+    ports: 
+      - 8090:8080
+    depends_on:
+      - db
+    networks:
+    - proxy
+
+volumes:
+  wordpress:
+  db:
+
+networks:
+  proxy:
+    external: true

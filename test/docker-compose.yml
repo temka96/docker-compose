@@ -1,0 +1,24 @@
+version: '3'
+services:
+  
+  myserver1:
+    image: nginx
+    container_name: nginx1
+    volumes:
+      - ./index-server1.html:/usr/share/nginx/html/index.html
+    networks:
+      - proxy
+  
+  myserver2:
+    image: nginx
+    container_name: nginx2
+    volumes:
+      - ./index-server2.html:/usr/share/nginx/html/index.html
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true
+      
+
+ 

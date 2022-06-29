@@ -3,7 +3,6 @@ services:
 
  wordpress:
   image: wordpress:php7.4-fpm-alpine
-  container_name: wordpress
   ports:
     - 9000:9000
   environment:
@@ -16,15 +15,13 @@ services:
     - wordpress:/var/www/html
   depends_on:
     - db
-  networks:
-    - internal
+
   deploy:
     mode: replicated
     replicas: 2 
 
  web:
   image: nginx
-  container_name: nginx
   volumes:
     - wordpress:/var/www/html
     - ./templates:/etc/nginx/conf.d
@@ -33,7 +30,6 @@ services:
   depends_on:
       - wordpress
   networks:
-    - internal
     - proxy
   deploy:
     mode: replicated
@@ -45,11 +41,8 @@ services:
              
  redis:
     image: redis
-    container_name: redis
     depends_on:
       - wordpress
-    networks:
-      - internal
     deploy:
       mode: replicated
       replicas: 1
@@ -58,7 +51,6 @@ services:
 
  db:
     image: mysql:5.7
-    container_name: mysql
     environment:
       MYSQL_DATABASE: mysqldb
       MYSQL_USER: user
@@ -66,8 +58,6 @@ services:
       MYSQL_ROOT_PASSWORD: toor
     volumes: 
       - db:/var/lib/mysql
-    networks:
-      - internal
     deploy:
       mode: replicated
       replicas: 1
@@ -76,13 +66,10 @@ services:
  
  adminer:
     image: adminer:4.8.1
-    container_name: adminer
     ports: 
       - 8090:8080
     depends_on:
       - db
-    networks:
-      - internal
     deploy:
       mode: replicated
       replicas: 1
@@ -91,7 +78,6 @@ services:
 
  traefik:
     image: traefik:2.8
-    container_name: traefik
     ports:
       - 80:80
     volumes:
