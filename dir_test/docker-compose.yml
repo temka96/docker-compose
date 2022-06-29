@@ -19,21 +19,23 @@ services:
   networks:
     - proxy
  
-#  wordpress2:
-#   image: wordpress:php7.4-fpm-alpine
-#   container_name: wordpress2
-#   ports:
-#     - 9090:9000
-#   environment:
-#     WORDPRESS_DB_HOST: db
-#     WORDPRESS_DB_USER: user
-#     WORDPRESS_DB_PASSWORD: password
-#     WORDPRESS_DB_NAME: mysqldb
-#     WORDPRESS_REDIS_HOST: redis
-#   volumes:
-#     - wordpress:/var/www/html
-#   depends_on:
-#     - db
+ wordpress2:
+  image: wordpress:php7.4-fpm-alpine
+  container_name: wordpress2
+  ports:
+    - 9090:9000
+  environment:
+    WORDPRESS_DB_HOST: db
+    WORDPRESS_DB_USER: user
+    WORDPRESS_DB_PASSWORD: password
+    WORDPRESS_DB_NAME: mysqldb
+    WORDPRESS_REDIS_HOST: redis
+  volumes:
+    - wordpress:/var/www/html
+  depends_on:
+    - db
+  networks:
+    - proxy
 
  myserver1:
   image: nginx
@@ -46,16 +48,16 @@ services:
   networks:
     - proxy
  
-#  myserver2:
-#   image: nginx
-#   container_name: nginx2
-#   volumes:
-#     - wordpress:/var/www/html
-#     - ./templates:/etc/nginx/conf.d
-#   depends_on:
-#       - wordpress1
-#   networks:
-#     - proxy
+ myserver2:
+  image: nginx
+  container_name: nginx2
+  volumes:
+    - wordpress:/var/www/html
+    - ./templates:/etc/nginx/conf.d
+  depends_on:
+      - wordpress2
+  networks:
+    - proxy
  
  redis:
     image: redis
