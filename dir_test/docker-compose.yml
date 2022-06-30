@@ -89,6 +89,22 @@ services:
       - db
     networks:
     - proxy
+  
+ traefik:
+    image: traefik:latest
+    container_name: traefik
+    command: --docker --docker.domain=localhost
+    ports:
+      - 80:80
+    networks:
+      - proxy
+    volumes:
+      - /run/docker.sock:/run/docker.sock
+      - ./traefik/traefik.yml:/traefik.yml
+      - ./traefik/tls.yaml:/tls.yaml
+    depends_on:
+      - myserver1
+      - myserver2
 
 volumes:
   wordpress:
