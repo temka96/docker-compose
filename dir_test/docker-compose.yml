@@ -4,8 +4,6 @@ services:
  wordpress:
   image: wordpress:php7.4-fpm-alpine
   container_name: wordpress
-  ports:
-    - 9000:9000
   environment:
     WORDPRESS_DB_HOST: db
     WORDPRESS_DB_USER: user
@@ -22,8 +20,6 @@ services:
  wordpress2:
   image: wordpress:php7.4-fpm-alpine
   container_name: wordpress2
-  ports:
-    - 9090:9000
   environment:
     WORDPRESS_DB_HOST: db
     WORDPRESS_DB_USER: user
