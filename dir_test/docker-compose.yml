@@ -21,7 +21,7 @@ services:
   image: wordpress:php7.4-fpm-alpine
   container_name: wordpress2
   environment:
-    WORDPRESS_DB_HOST: db
+    WORDPRESS_DB_HOST: db2
     WORDPRESS_DB_USER: user
     WORDPRESS_DB_PASSWORD: password
     WORDPRESS_DB_NAME: mysqldb
@@ -29,7 +29,7 @@ services:
   volumes:
     - wordpress:/var/www/html
   depends_on:
-    - db
+    - db2
   networks:
     - proxy
 
@@ -39,72 +39,91 @@ services:
   volumes:
     - wordpress:/var/www/html
     - ./templates:/etc/nginx/conf.d
+    - ./ssl:/etc/nginx/ssl
   depends_on:
-      - wordpress
+    - wordpress
   networks:
     - proxy
- 
+
  myserver2:
   image: nginx
   container_name: nginx2
   volumes:
     - wordpress:/var/www/html
     - ./templates:/etc/nginx/conf.d
+    - ./ssl:/etc/nginx/ssl
   depends_on:
-      - wordpress2
+    - wordpress2
   networks:
     - proxy
  
  redis:
-    image: redis
-    container_name: redis
-    depends_on:
-      - wordpress
-    networks:
+  image: redis
+  container_name: redis
+  depends_on:
+    - wordpress
+    - wordpress2
+  networks:
+    - proxy
+
+ db:
+  image: mysql:5.7
+  container_name: mysql
+  environment:
+    MYSQL_DATABASE: mysqldb
+    MYSQL_USER: user
+    MYSQL_PASSWORD: password
+    MYSQL_ROOT_PASSWORD: toor
+  volumes: 
+    - db:/var/lib/mysql
+  networks:
     - proxy
       
- db:
-    image: mysql:5.7
-    container_name: mysql
-    environment:
-      MYSQL_DATABASE: mysqldb
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: toor
-    volumes: 
-      - db:/var/lib/mysql
-    networks:
+ db2:
+  image: mysql:5.7
+  container_name: mysql2
+  environment:
+    MYSQL_DATABASE: mysqldb2
+    MYSQL_USER: user
+    MYSQL_PASSWORD: password
+    MYSQL_ROOT_PASSWORD: toor
+  volumes: 
+    - db2:/var/lib/mysql
+  networks:
     - proxy
  
  adminer:
-    image: adminer:4.8.1
-    container_name: adminer
-    ports: 
-      - 8090:8080
-    depends_on:
-      - db
-    networks:
+  image: adminer:4.8.1
+  container_name: adminer
+  ports: 
+    - 8090:8080
+  depends_on:
+    - db
+    - db2
+  networks:
     - proxy
   
  traefik:
-    image: traefik:latest
-    container_name: traefik
-    command: --docker --docker.domain=localhost
-    ports:
-      - 80:80
-    networks:
-      - proxy
-    volumes:
-      - /run/docker.sock:/run/docker.sock
-      - ./traefik/traefik.yml:/traefik.yml
-      - ./traefik/tls.yaml:/tls.yaml
-    depends_on:
-      - myserver1
-      - myserver2
+  image: traefik:latest
+  container_name: traefik
+  command: --docker --docker.domain=docker.loc
+  ports:
+    - 80:80
+    - 443:443
+  networks:
+    - proxy
+  volumes:
+    - /run/docker.sock:/run/docker.sock
+    - ./traefik/traefik.yml:/traefik.yml
+    - ./traefik/tls.yaml:/tls.yaml
+  depends_on:
+    - myserver1
+    - myserver2
 
 volumes:
   wordpress:
   db:
+  db2:
 
 networks:
   proxy:

@@ -1,12 +1,12 @@
 http:
     routers:
         http_router:
-            rule: "Host(`localhost`)"
+            rule: "Host(`traefik.docker.loc`)"
             service: allbackend
 
     services:
         allbackend:
             loadBalancer:
                 servers:
-                    - url: "http://myserver1/"
-                    - url: "http://myserver2/"
+                    - url: "https://myserver1/"
+                    - url: "https://myserver2/"
