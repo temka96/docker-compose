@@ -39,7 +39,6 @@ services:
   volumes:
     - wordpress:/var/www/html
     - ./templates:/etc/nginx/conf.d
-    - ./ssl:/etc/nginx/ssl
   depends_on:
     - wordpress
   networks:
@@ -51,7 +50,6 @@ services:
   volumes:
     - wordpress:/var/www/html
     - ./templates:/etc/nginx/conf.d
-    - ./ssl:/etc/nginx/ssl
   depends_on:
     - wordpress2
   networks:
@@ -119,6 +117,8 @@ services:
   depends_on:
     - myserver1
     - myserver2
+  labels:
+    - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
 volumes:
   wordpress:

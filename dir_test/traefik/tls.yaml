@@ -1,12 +1,22 @@
-http:
-    routers:
-        http_router:
-            rule: "Host(`traefik.docker.loc`)"
-            service: allbackend
+# http:
+#     routers:
+#         http_router:
+#             rule: "Host(`docker.loc`)"
+#             service: allbackend
+       
+#     services:
+#         allbackend:
+#             loadBalancer:
+#                 servers:
+#                     - url: "http://myserver1/"
+#                     - url: "http://myserver2/"
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: ./ssl/docker.loc.crt
+        keyFile: ./ssl/docker.loc.key
 
-    services:
-        allbackend:
-            loadBalancer:
-                servers:
-                    - url: "https://myserver1/"
-                    - url: "https://myserver2/"
+  certificates:
+      certFile: ./ssl/docker.loc.crt
+      keyFile: /ssl/docker.loc.key
