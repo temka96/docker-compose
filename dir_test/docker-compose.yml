@@ -111,14 +111,13 @@ services:
   networks:
     - proxy
   volumes:
-    - /run/docker.sock:/run/docker.sock
     - ./traefik/traefik.yml:/traefik.yml
     - ./traefik/tls.yaml:/tls.yaml
+    - ./traefik/ssl/docker.loc.crt:/ssl/docker.loc.crt
+    - ./traefik/ssl/docker.loc.key:/ssl/docker.loc.key
   depends_on:
     - myserver1
     - myserver2
-  labels:
-    - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
 volumes:
   wordpress:
